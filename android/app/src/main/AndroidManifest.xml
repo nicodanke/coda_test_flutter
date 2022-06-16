@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.coda_flutter_test">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
    <application
         android:label="coda_flutter_test"
         android:name="${applicationName}"
