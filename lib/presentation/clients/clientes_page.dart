@@ -42,23 +42,25 @@ class ClientsPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          SingleChildScrollView(
-            child: Container(
-              width: double.infinity,
-              color: Colors.transparent,
-              child: Center(
-                child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 34, bottom: 26),
-                        child: Image.asset(
-                          'assets/clients/small-logo.png',
-                          fit: BoxFit.cover,
+          Positioned.fill(
+            child: SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                color: Colors.transparent,
+                child: Center(
+                  child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 34, bottom: 26),
+                          child: Image.asset(
+                            'assets/clients/small-logo.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const ClientsList(),
-                    ],
-                  ),
+                        const ClientsList(),
+                      ],
+                    ),
+                ),
               ),
             ),
           )
