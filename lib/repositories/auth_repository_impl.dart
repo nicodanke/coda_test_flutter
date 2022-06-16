@@ -19,6 +19,7 @@ class AuthRepositoryImpl extends AuthRepository{
 
   @override
   Future<AuthUser?> login(String email, String password) async {
+    _logger.info('Performing Login');
     final url = Uri.parse('$baseUrl/mia-auth/login');
     var res = await http.post(
       url,
@@ -32,11 +33,12 @@ class AuthRepositoryImpl extends AuthRepository{
     if (!data['success']) {
       String errorMessage = data['error']['message'];
       int errorCode = data['error']['code'];
-      _logger.severe('Register Error: $errorMessage');
+      _logger.severe('Error: $errorMessage');
       _getException(errorCode, errorMessage);
     } else {
       final response = data['response'] as Map<String, dynamic>;
       var currentUser = AuthUser.fromJson(response);
+      _logger.info('Login Successful');
       return currentUser;
     }
     return null;

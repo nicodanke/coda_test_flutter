@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class InvalidPassword extends Equatable implements Exception{
-  const InvalidPassword();
+class InvalidMail extends Equatable implements Exception{
+  const InvalidMail();
 
   @override
   List<Object?> get props => [];

@@ -26,6 +26,7 @@ class ClientRepositoryImpl extends ClientRepository{
 
   @override
   Future<List<Client>> findAll() async {
+    _logger.info('Getting all clients');
     var keepGetting = true;
     var nextPageUrl = '';
     List<Client> clients = [];
@@ -46,7 +47,7 @@ class ClientRepositoryImpl extends ClientRepository{
         if (!data['success']) {
           String errorMessage = data['error']['message'];
           int errorCode = data['error']['code'];
-          _logger.severe('Register Error: $errorMessage');
+          _logger.severe('Error: $errorMessage');
           _getException(errorCode, errorMessage);
           keepGetting = false;
         } else {
@@ -60,16 +61,19 @@ class ClientRepositoryImpl extends ClientRepository{
           clients = [...clients, ...clientsFromJson(json.toString())];
         }
       }
+      _logger.info('Get all clients successful');
       return clients;
     } on Exception catch (e){
       _logger.severe('Register Error: $e');
       clients = [];
     }
+    _logger.severe('Get all clients failed');
     return clients;
   }
   
   @override
   Future<Client?> save(ClientCreate clientCreate) async {
+    _logger.info('Saving new client');
     final url = Uri.parse('$baseUrl/client/save');
     final accessToken = await storage.read(key: 'accessToken');
     Map<String, String> headers = {
@@ -85,9 +89,12 @@ class ClientRepositoryImpl extends ClientRepository{
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) {
       String errorMessage = data['error']['message'];
-      _logger.severe('Register Error: $errorMessage');
+      int errorCode = data['error']['code'];
+      _logger.severe('Error: $errorMessage');
+      _getException(errorCode, errorMessage);
     } else {
       final response = data['response'] as Map<String, dynamic>;
+      _logger.info('Saving new client successfully');
       return Client.fromJson(response);
     }
     return null;
@@ -95,6 +102,7 @@ class ClientRepositoryImpl extends ClientRepository{
   
   @override
   Future<Client?> update(ClientCreate clientCreate) async {
+    _logger.info('Updating client with id: ${clientCreate.id}');
     final url = Uri.parse('$baseUrl/client/save');
     final accessToken = await storage.read(key: 'accessToken');
     Map<String, String> headers = {
@@ -106,20 +114,24 @@ class ClientRepositoryImpl extends ClientRepository{
       body: jsonEncode(clientCreate.toJson()),
       headers: headers,
     );
-
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) {
       String errorMessage = data['error']['message'];
-      _logger.severe('Register Error: $errorMessage');
+      int errorCode = data['error']['code'];
+      _logger.severe('Error: $errorMessage');
+      _getException(errorCode, errorMessage);
     } else {
       final response = data['response'] as Map<String, dynamic>;
+      _logger.info('Client with id: ${clientCreate.id} updated successfully');
       return Client.fromJson(response);
     }
+    _logger.severe('Error: updating client with id: ${clientCreate.id}');
     return null;
   }
   
   @override
   Future<bool> delete(int id) async {
+    _logger.info('Deleting client with id: $id');
     final url = Uri.parse('$baseUrl/client/remove/$id');
     final accessToken = await storage.read(key: 'accessToken');
     Map<String, String> headers = {
@@ -135,11 +147,14 @@ class ClientRepositoryImpl extends ClientRepository{
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) {
       String errorMessage = data['error']['message'];
-      _logger.severe('Register Error: $errorMessage');
+      int errorCode = data['error']['code'];
+      _logger.severe('Error: $errorMessage');
+      _getException(errorCode, errorMessage);
     } else {
       final response = data['response'];
       return response;
     }
+    _logger.severe('Deleting client with id: $id failed');
     return false;
   }
 

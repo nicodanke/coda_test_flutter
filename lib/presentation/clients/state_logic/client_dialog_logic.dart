@@ -2,6 +2,8 @@ import 'package:binder/binder.dart';
 import 'package:coda_flutter_test/interfaces/services/client_service.dart';
 import 'package:coda_flutter_test/models/client.dart';
 import 'package:coda_flutter_test/models/exceptions/invalid_fields.dart';
+import 'package:coda_flutter_test/models/exceptions/invalid_mail.dart';
+import 'package:coda_flutter_test/models/validators/validators.dart';
 import 'package:coda_flutter_test/presentation/clients/state_logic/client_dialog_state.dart';
 import 'package:coda_flutter_test/presentation/clients/state_logic/client_logic.dart';
 import 'package:coda_flutter_test/presentation/utils/get_ref.dart';
@@ -50,6 +52,9 @@ class ClientDialogLogic with Logic{
     if(firstName.isEmpty || lastName.isEmpty || email.isEmpty){
       write(stateRef, read(stateRef).copyWith(submitStatus: const SubmissionFailed(error: InvalidFields())));
       return;
+    } else if (FieldValidator.validateEmail(email) != null){
+      write(stateRef, read(stateRef).copyWith(submitStatus: const SubmissionFailed(error: InvalidMail())));
+      return;
     }
 
     final clientCreate = ClientCreate(firstName: firstName, lastName: lastName, email: email,);
@@ -72,6 +77,9 @@ class ClientDialogLogic with Logic{
 
     if(firstName.isEmpty || lastName.isEmpty || email.isEmpty){
       write(stateRef, read(stateRef).copyWith(submitStatus: const SubmissionFailed(error: InvalidFields())));
+      return;
+    } else if (FieldValidator.validateEmail(email) != null){
+      write(stateRef, read(stateRef).copyWith(submitStatus: const SubmissionFailed(error: InvalidMail())));
       return;
     }
 

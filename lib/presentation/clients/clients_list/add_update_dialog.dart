@@ -1,15 +1,17 @@
 import 'dart:io';
 
-import 'package:another_flushbar/flushbar.dart';
 import 'package:binder/binder.dart';
 import 'package:coda_flutter_test/models/client.dart';
 import 'package:coda_flutter_test/models/exceptions/invalid_fields.dart';
+import 'package:coda_flutter_test/models/exceptions/invalid_mail.dart';
 import 'package:coda_flutter_test/models/validators/validators.dart';
 import 'package:coda_flutter_test/presentation/utils/get_ref.dart';
+import 'package:coda_flutter_test/presentation/utils/snackbar.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logging/logging.dart';
 
 class AddUpdateClientDialog extends StatefulWidget {
   final Client? client;
@@ -18,10 +20,13 @@ class AddUpdateClientDialog extends StatefulWidget {
 
   const AddUpdateClientDialog({required this.title, required this.onPressedSave, this.client, Key? key}) : super(key: key);
 
+  @override
   AddUpdateClientDialogState createState() => AddUpdateClientDialogState();
 }
 
 class AddUpdateClientDialogState extends State<AddUpdateClientDialog>{
+  static final Logger _logger = Logger('AddUpdateClientDialog');
+  
   File? image;
 
   Future pickImage() async {
@@ -33,7 +38,7 @@ class AddUpdateClientDialogState extends State<AddUpdateClientDialog>{
         this.image = imageTemporary;
       });
     } on PlatformException catch(e){
-      print('Failed to pick an image: $e');
+      _logger.severe('Failed to pick an image: $e');
     }
     
   }
@@ -199,11 +204,8 @@ class AddUpdateClientDialogState extends State<AddUpdateClientDialog>{
     if (status is SubmissionFailed) {
       String errorMessage = 'Error adding new client';
       if(status.error is InvalidFields) errorMessage = 'Please complete all fields';
-      Flushbar(
-        title: 'Error:',
-        message:  errorMessage,
-        duration: const Duration(seconds: 3),
-      ).show(context);
+      if(status.error is InvalidMail) errorMessage = 'Please enter a valid mail';
+      Snackbar.triggerSnackbar(context: context, message: errorMessage, title: 'Error:');
     }
     if (status is SubmissionSuccess){
       Navigator.of(context).pop();

@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:binder/binder.dart';
 import 'package:coda_flutter_test/models/auth_user.dart';
 import 'package:coda_flutter_test/models/exceptions/api/api_error.dart';
@@ -6,6 +5,7 @@ import 'package:coda_flutter_test/models/exceptions/login_error.dart';
 import 'package:coda_flutter_test/models/validators/validators.dart';
 import 'package:coda_flutter_test/presentation/utils/get_ref.dart';
 import 'package:coda_flutter_test/presentation/utils/route_generator.dart';
+import 'package:coda_flutter_test/presentation/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatelessWidget {
@@ -49,16 +49,10 @@ class LoginForm extends StatelessWidget {
   void _handleSubmitFail(BuildContext context, FormSubmissionStatus status) {
     if (status is SubmissionFailed) {
       if(status.error is LoginError){
-        Flushbar(
-          message:  "Wrong user or password",
-          duration: const Duration(seconds: 3),
-        ).show(context);
+        Snackbar.triggerSnackbar(context: context, message: "Wrong user or password");
       } else if (status.error is ApiException){
         ApiException error = status.error as ApiException;
-        Flushbar(
-          message:  error.message,
-          duration: const Duration(seconds: 3),
-        ).show(context);
+        Snackbar.triggerSnackbar(context: context, message: error.message);
       }
       context.use(GetRef.loginLogic).restSubmit();
     }

@@ -1,10 +1,10 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:binder/binder.dart';
 import 'package:coda_flutter_test/models/client.dart';
 import 'package:coda_flutter_test/models/exceptions/delete_error.dart';
 import 'package:coda_flutter_test/presentation/clients/clients_list/add_update_dialog.dart';
 import 'package:coda_flutter_test/presentation/clients/clients_list/loading_clients.dart';
 import 'package:coda_flutter_test/presentation/utils/get_ref.dart';
+import 'package:coda_flutter_test/presentation/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 
 class ClientsList extends StatelessWidget {
@@ -82,9 +82,27 @@ class ClientsList extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 30),
               child: ClientLoadMoreButton(),
             ),
+            // Handlers
+            StateListener(
+              watchable: GetRef.clientStateRef.select((state) => state.submitStatusDelete),
+              onStateChanged: _handleDeletion,
+              child: const SizedBox.shrink(),
+            ),
           ],
         ),
       );
+  }
+
+  void _handleDeletion(BuildContext context, FormSubmissionStatus status) {
+    if (status is SubmissionFailed) {
+      String errorMessage = status.error.toString();
+      if(status.error is DeleteError) errorMessage = 'Error deleting client';
+      Snackbar.triggerSnackbar(context: context, message: errorMessage, title: 'Error: ');
+    }
+    if (status is SubmissionSuccess){
+      Snackbar.triggerSnackbar(context: context, message: 'Client deleted');
+    }
+    context.use(GetRef.clientLogic).resetSubmit();
   }
 }
 
@@ -301,12 +319,6 @@ class DropdownMenuButtonState extends State<DropdownMenuButton>{
                           context.use(GetRef.clientLogic).delete(widget.client.id);
                         },
                       ),
-                      // Handlers
-                      StateListener(
-                        watchable: GetRef.clientStateRef.select((state) => state.submitStatusDelete),
-                        onStateChanged: _handleDeletion,
-                        child: const SizedBox.shrink(),
-                      ),
                     ],
                   ),
                 ),
@@ -315,25 +327,6 @@ class DropdownMenuButtonState extends State<DropdownMenuButton>{
           ],
         ),
       );
-  }
-
-  void _handleDeletion(BuildContext context, FormSubmissionStatus status) {
-    if (status is SubmissionFailed) {
-      String errorMessage = status.error.toString();
-      if(status.error is DeleteError) errorMessage = 'Error deleting client';
-      Flushbar(
-        title: 'Error:',
-        message:  errorMessage,
-        duration: const Duration(seconds: 3),
-      ).show(context);
-    }
-    if (status is SubmissionSuccess){
-      Flushbar(
-        message: 'Client deleted',
-        duration: const Duration(seconds: 3),
-      ).show(context);
-    }
-    context.use(GetRef.clientLogic).resetSubmit();
   }
 
   @override

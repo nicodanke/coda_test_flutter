@@ -11,7 +11,7 @@ import 'package:logging/logging.dart';
 
 @LazySingleton(as: AuthService)
 class AuthServiceImpl implements AuthService {
-  static final logger = Logger('AuthServiceImpl');
+  static final _logger = Logger('AuthServiceImpl');
 
   AuthRepository get repository => GetIt.instance.get();
 
@@ -19,7 +19,9 @@ class AuthServiceImpl implements AuthService {
 
   @override
   Future<AuthUser?> login(String email, String password) async {
+    _logger.info('Performing Login');
     if(email.isEmpty || password.isEmpty){
+      _logger.severe('Error: empty password or email');
       throw const LoginError();
     }
 
@@ -30,6 +32,7 @@ class AuthServiceImpl implements AuthService {
 
   @override
   Future<void> logout() async {
+    _logger.info('Performing Logout');
     storage.delete(key: 'accessToken');
   }
 }

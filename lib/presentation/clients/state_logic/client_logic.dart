@@ -52,8 +52,8 @@ class ClientLogic with Logic implements Loadable{
     try{
       bool result = await service.delete(id);
       if(result){
-        write(stateRef, read(stateRef).copyWith(submitStatusDelete: SubmissionSuccess()));
         load();
+        write(stateRef, read(stateRef).copyWith(submitStatusDelete: SubmissionSuccess()));
         return;
       }
       write(stateRef, read(stateRef).copyWith(submitStatusDelete: const SubmissionFailed(error: DeleteError())));
